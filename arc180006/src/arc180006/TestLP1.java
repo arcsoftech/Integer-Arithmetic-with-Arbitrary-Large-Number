@@ -10,7 +10,7 @@
 	java -Xss512m -Xms2g TestLP1 6
 */
 
-package idsa;
+package arc180006;
 public class TestLP1 {
     public static void main(String[] args) throws Exception {
         int val = 0;
