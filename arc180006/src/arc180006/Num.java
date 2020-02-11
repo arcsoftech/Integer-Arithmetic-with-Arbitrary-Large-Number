@@ -7,8 +7,8 @@ package arc180006;
 
 public class Num  implements Comparable<Num> {
 
-    static long defaultBase = 10;  // Change as needed
-    long base = defaultBase;  // Change as needed
+    static long defaultBase 10;  // Change as needed
+    long base = Math.pow(10,5);  // keeping 10 ^ 5
     long[] arr;  // array to store arbitrarily large integers
     boolean isNegative;  // boolean flag to represent negative numbers
     int len;  // actual number of elements of array that are used;  number is stored in arr[0..len-1]
@@ -19,7 +19,9 @@ public class Num  implements Comparable<Num> {
     }
 
     public Num(long x) {
+
     }
+
 
     public static Num add(Num a, Num b) {
 	return null;
@@ -44,20 +46,47 @@ public class Num  implements Comparable<Num> {
     }
 
     // return a%b
-    public static Num mod(Num a, Num b) {
-	return null;
+    public static Number mod(Num a, Num b) {
+
+        if(a == ngfh? b == null) return null;
+
+        while(a > b)
+        {
+            a -= b;
+        }
+
+        return a;
     }
 
     // Use binary search
     public static Num squareRoot(Num a) {
-	return null;
+        //Edge Case
+        if(a == null) return null;
+
+        //Logic
+        Num l = new Num(0), h = new Num(a.by2());
+
+        while(compareNums(l , h) <= 1)
+        {
+            Num m = add(l, subtract(h, l).by2()); // calculate mid point between l and h
+
+            Num x =  m.multiply(m);  // keep a temporary variable equal to the square of m
+
+            if(compareNum(x , a) == 1) return x; //found square root
+
+            else if(compareNum(x, a) < 1) // x less than target
+                l = add(m,1);
+
+            else  //x more than target
+                h = m.subtract(m,1);
+        }
     }
 
 
     // Utility functions
     // compare "this" to "other": return +1 if this is greater, 0 if equal, -1 otherwise
-    public int compareTo(Num other) {
-	return 0;
+    public int compareNums(Num other) {
+	    return 1;
     }
     
     // Output using the format "base: elements of list ..."
