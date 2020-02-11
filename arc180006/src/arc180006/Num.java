@@ -24,46 +24,37 @@ public class Num implements Comparable<Num> {
     }
 
     public Num(String s) {
-        if (s.length() == 0) {
-            throw new NullPointerException("Invalid number");
-        }
-        list = new ArrayList<>();
-        Num base10 = new Num(10L);
-        char[] arr = new StringBuilder(s).toString().toCharArray();
-        Num num = this;
-        for (char current : arr) {
-            if (current == '-') {
-                this.isNegative = true;
-            } 
-            else {
-                Num first = Num.product(num, base10);
-                Num second = new Num(current - '0');
-                num = Num.add(first, second);
-            }
-        }
-        this.list = num.list;
+        //TODO
     }
 
     public Num(long x) {
-        list = new LinkedList<>();
-        long quotient = base + 1, remainder = 0;
-        if(x<0){
-            this.isNegative = true;
-            x = Math.abs(x);
-        }
-        if (x < base) {
-            list.add(x);
-        } else {
-            while (x >= base) {
-                quotient = x / base;
-                remainder = x % base;
-                list.add(remainder);
-                x = quotient;
-            } 
-            if (quotient != 0) {
-                list.add(quotient);
-            }
-        }
+        isNegative = false;
+
+		// When x is Negative, making it positive with flag isNegative as true
+		if (x < 0) {
+			this.isNegative = true;
+			x = -1 * x;
+		}
+		double lengthArr = 0;
+
+		// When x = 0, lengthArr = -Infinity
+		if (x == 0) {
+			lengthArr = 1;
+		}
+		// No of digits in this.Num = log_base (x) + 1 = log(x)/log(base) + 1
+		else {
+			lengthArr = ((Math.log((double) x)) / (Math.log((double) base))) + 1;
+		}
+
+		this.len = (int) lengthArr; // Real to integer (floor function)
+		arr = new long[this.len];
+
+		long n = x;
+		// Iteratively pass appropriate digit to this.arr (array of long)
+		for (int i = 0; i < len; i++) {
+			arr[i] = n % base();
+			n /= base();
+		}
     }
 
     public static Num add(Num a, Num b) {
