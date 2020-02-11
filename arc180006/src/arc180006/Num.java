@@ -144,10 +144,18 @@ public class Num implements Comparable<Num> {
         {
             return 1;
         }
+        else if(this.isNegative && num2.isNegative)
+        {
+            int out = compareList(this.getList(), num2.getList());
+            if(out!=0)
+            {
+                return out*-1;
+            }
+            return out;
+        }
         else{
             return compareList(this.getList(), num2.getList());
         }
-        return 0;
     }
 
     // Output using the format "base: elements of list ..."
