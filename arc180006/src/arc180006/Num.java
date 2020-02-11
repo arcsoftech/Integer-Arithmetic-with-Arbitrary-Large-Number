@@ -135,7 +135,18 @@ public class Num implements Comparable<Num> {
     // Utility functions
     // compare "this" to "other": return +1 if this is greater, 0 if equal, -1
     // otherwise
-    public int compareTo(Num other) {
+    public int compareTo(Num num2) {
+        if(this.isNegative && !num2.isNegative)
+        {
+            return -1;
+        }
+        else if(!this.isNegative && num2.isNegative)
+        {
+            return 1;
+        }
+        else{
+            return compareList(this.getList(), num2.getList());
+        }
         return 0;
     }
 
