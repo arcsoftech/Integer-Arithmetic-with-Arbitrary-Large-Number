@@ -100,58 +100,59 @@ public class Num implements Comparable<Num> {
         if (a.getList().size() == 0 || b.getList().size() == 0) {
             return new Num(0L);
         }
-            // karatsuba implementation
-        out = karatsuba(a,b);
+        // karatsuba implementation
+        out = karatsuba(a, b);
 
-        
         out.isNegative = a.isNegative ^ b.isNegative;
 
         return out;
     }
-    private static Num karatsuba(Num a, Num b){
-        if(b.getList().size() == 1){
-            return multiply(a,b.getList().get(0));
+
+    private static Num karatsuba(Num a, Num b) {
+        if (b.getList().size() == 1) {
+            return multiply(a, b.getList().get(0));
         }
-        int m = b.getList().size()/2;
+        int m = b.getList().size() / 2;
         Num a1 = new Num();
         a1.getList().addAll(a.getList().subList(m, a.getList().size()));
         Num a2 = new Num();
-        a2.getList().addAll(a.getList().subList(0,m));
+        a2.getList().addAll(a.getList().subList(0, m));
         Num b1 = new Num();
         b1.getList().addAll(b.getList().subList(m, b.getList().size()));
         Num b2 = new Num();
-        b2.getList().addAll(b.getList().subList(0,m));
+        b2.getList().addAll(b.getList().subList(0, m));
 
-        Num e = Num.product(a1,b1);
+        Num e = Num.product(a1, b1);
         Num f = Num.product(a2, b2);
-        Num ef = Num.product(Num.add(a1, a2),Num.add(b1,b2));
-        Num efFinal= multiplyBase(Num.subtract(ef, Num.add(e,f)),m);
-        Num temp = Num.add(multiplyBase(e,2*m),efFinal);
-        return Num.add(temp,f);
+        Num ef = Num.product(Num.add(a1, a2), Num.add(b1, b2));
+        Num efFinal = multiplyBase(Num.subtract(ef, Num.add(e, f)), m);
+        Num temp = Num.add(multiplyBase(e, 2 * m), efFinal);
+        return Num.add(temp, f);
 
     }
-    private static Num multiplyBase(Num a, long n){
+
+    private static Num multiplyBase(Num a, long n) {
         Num out = new Num();
         List<Long> outList = out.getList();
         outList.addAll(a.getList());
-        for(long i = 0; i < n; i++){
-            outList.add(0,0L);
+        for (long i = 0; i < n; i++) {
+            outList.add(0, 0L);
         }
         return out;
     }
 
-    private static Num multiply(Num a, Long b){
+    private static Num multiply(Num a, Long b) {
         Num out = new Num();
         List<Long> outList = out.getList();
         Iterator<Long> num1Iteration = a.getList().iterator();
         Long carry = 0L;
-        while(num1Iteration.hasNext()){
+        while (num1Iteration.hasNext()) {
             Long prod = (next(num1Iteration) * b) + carry;
             List<Long> prodList = toBase(prod, base);
             outList.add(prodList.get(0));
             carry = prodList.size() > 1 ? prodList.get(1) : 0L;
         }
-        if(carry > 0){
+        if (carry > 0) {
             outList.add(carry);
         }
 
@@ -205,24 +206,17 @@ public class Num implements Comparable<Num> {
     // compare "this" to "other": return +1 if this is greater, 0 if equal, -1
     // otherwise
     public int compareTo(Num num2) {
-        if(this.isNegative && !num2.isNegative)
-        {
+        if (this.isNegative && !num2.isNegative) {
             return -1;
-        }
-        else if(!this.isNegative && num2.isNegative)
-        {
+        } else if (!this.isNegative && num2.isNegative) {
             return 1;
-        }
-        else if(this.isNegative && num2.isNegative)
-        {
+        } else if (this.isNegative && num2.isNegative) {
             int out = compareList(this.getList(), num2.getList());
-            if(out!=0)
-            {
-                return out*-1;
+            if (out != 0) {
+                return out * -1;
             }
             return out;
-        }
-        else{
+        } else {
             return compareList(this.getList(), num2.getList());
         }
     }
@@ -268,7 +262,13 @@ public class Num implements Comparable<Num> {
     // Tokenize the string and then input them to parser
     // Implementing this method correctly earns you an excellence credit
     public static Num evaluateExp(String expr) {
-        return null;
+        Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
+        return evalE(queue);
+    }
+
+    public static Num evaluateExp(String[] expr) {
+        Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
+        return evalE(queue);
     }
 
     public List<Long> getList() {
@@ -279,9 +279,9 @@ public class Num implements Comparable<Num> {
         Num out = new Num();
         int compareOut = compareList(a.getList(), b.getList());
         if (compareOut > 0) {
-            subtract(a.getList(), b.getList(),out.getList());
+            subtract(a.getList(), b.getList(), out.getList());
         } else if (compareOut < 0) {
-            subtract(b.getList(), a.getList(),out.getList());
+            subtract(b.getList(), a.getList(), out.getList());
             out.isNegative = true;
         } else {
             out = new Num(0L);
@@ -295,26 +295,25 @@ public class Num implements Comparable<Num> {
         return out;
     }
 
-    private static Long next(Iterator<Long> iterator){
-        return iterator.hasNext()? iterator.next() : 0L;
+    private static Long next(Iterator<Long> iterator) {
+        return iterator.hasNext() ? iterator.next() : 0L;
     }
-    
+
     private static void add(List<Long> num1List, List<Long> num2List, List<Long> out, long base) {
-        
+
         Iterator<Long> num1Iterator = num1List.iterator();
-    	Iterator<Long> num2Iterator = num2List.iterator();
-    	Long carry = 0L;
-    	while(num1Iterator.hasNext() || num2Iterator.hasNext() || carry > 0){
+        Iterator<Long> num2Iterator = num2List.iterator();
+        Long carry = 0L;
+        while (num1Iterator.hasNext() || num2Iterator.hasNext() || carry > 0) {
             Long sum = next(num1Iterator) + next(num2Iterator) + carry;
             if (sum >= base) {
                 carry = 1L;
                 sum -= base;
-            }
-            else {
+            } else {
                 carry = 0L;
             }
             out.add(sum);
-    	}
+        }
 
     }
 
@@ -322,24 +321,21 @@ public class Num implements Comparable<Num> {
         Iterator<Long> num1Iterator = num1List.iterator();
         Iterator<Long> num2Iterator = num2List.iterator();
         Long borrow = 0L;
-        while(num1Iterator.hasNext() || num2Iterator.hasNext() || borrow > 0){
+        while (num1Iterator.hasNext() || num2Iterator.hasNext() || borrow > 0) {
             Long a = next(num1Iterator);
             Long b = next(num2Iterator);
             Long out;
-            if(a>=b)
-            {
-                out= a-(b+borrow);
+            if (a >= b) {
+                out = a - (b + borrow);
                 borrow = 0L;
-            }
-            else
-            {
-                out = (a+base) - b; 
+            } else {
+                out = (a + base) - b;
                 borrow = 1L;
             }
             outList.add(out);
 
-    	}
-        
+        }
+
     }
 
     private static int compareList(List<Long> num1List, List<Long> num2List) {
@@ -358,6 +354,50 @@ public class Num implements Comparable<Num> {
         return out;
     }
 
+    private static Num evalE(Queue<String> qt) {
+        Num val1 = evalT(qt);
+            while (!qt.isEmpty() && ((qt.peek().equals("+")) || (qt.peek().equals("-")))) {
+                String oper = qt.remove();
+                Num val2 = evalT(qt);
+                if (oper.equals("+"))
+                    val1 = Num.add(val1, val2);
+                else
+                    val1 = Num.subtract(val1, val2);
+            }
+        
+        return val1;
+    }
+
+    private static Num evalT(Queue<String> qt) {
+        Num val1 = evalF(qt);
+        if (!qt.isEmpty())
+        {
+            while ((qt.peek().equals("*")) || (qt.peek().equals("/"))) {
+                String oper = qt.remove();
+                Num val2 = evalF(qt);
+                if (oper.equals("*"))
+                    val1 = Num.product(val1, val2);
+                else
+                    val1 = Num.divide(val1, val2);
+            }
+        }
+     
+        return val1;
+    }
+
+    private static Num evalF(Queue<String> qt) {
+        Num val;
+        if ((qt.peek().equals("("))) {
+            String oper = qt.remove();
+            val = evalE(qt);
+            oper = qt.remove(); // ")""
+        } else {
+            String num = qt.remove();
+            val = new Num(num);
+        }
+        return val;
+    }
+
     /**
      * Main Function- Driver Code
      * 
@@ -369,6 +409,10 @@ public class Num implements Comparable<Num> {
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
+        Num f = Num.evaluateExp(new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321",
+                        "*", "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
+                        "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
+                        "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
         System.out.println(d);
         System.out.println(z);
         Num a = Num.power(x, 8);
