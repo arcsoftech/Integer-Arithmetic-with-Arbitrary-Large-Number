@@ -266,7 +266,7 @@ public class Num implements Comparable<Num> {
         return evalE(queue);
     }
 
-    public static Num evaluateExp(String[] expr) {
+    public static Num evaluateInfix(String[] expr) {
         Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
         return evalE(queue);
     }
@@ -409,7 +409,7 @@ public class Num implements Comparable<Num> {
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
-        Num f = Num.evaluateExp(new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321",
+        Num f = Num.evaluateInfix(new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321",
                         "*", "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
                         "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
                         "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
