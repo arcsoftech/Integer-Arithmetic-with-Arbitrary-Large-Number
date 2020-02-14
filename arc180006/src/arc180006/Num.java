@@ -10,7 +10,7 @@ import java.util.*;
 public class Num implements Comparable<Num> {
 
     static long defaultBase = 10; // Change as needed
-    static long base = 100000; // Change as needed
+    static long base = 100000L; // Change as needed
     long[] arr; // array to store arbitrarily large integers
     boolean isNegative; // boolean flag to represent negative numbers
     static boolean karatsuba = false;
@@ -28,7 +28,7 @@ public class Num implements Comparable<Num> {
             throw new NullPointerException("Invalid number");
         }
         list = new ArrayList<>();
-        Num Base = new Num(base);
+        Num Base = new Num(10);
         char[] arr = new StringBuilder(s).toString().toCharArray();
         Num num = this;
         for (char current : arr) {
@@ -100,16 +100,85 @@ public class Num implements Comparable<Num> {
         if (a.getList().size() == 0 || b.getList().size() == 0) {
             return new Num(0L);
         }
-        if (karatsuba) {
             // karatsuba implementation
+        out = karatsuba(a,b);
 
-        } else {
-            // Normal multiplication
-        }
-
+        
         out.isNegative = a.isNegative ^ b.isNegative;
 
         return out;
+    }
+    private static Num karatsuba(Num a, Num b){
+        if(b.getList().size() == 1){
+            return multiply(a,b.getList().get(0));
+        }
+        int m = b.getList().size()/2;
+        Num a1 = new Num();
+        a1.getList().addAll(a.getList().subList(m, a.getList().size()));
+        Num a2 = new Num();
+        a2.getList().addAll(a.getList().subList(0,m));
+        Num b1 = new Num();
+        b1.getList().addAll(b.getList().subList(m, b.getList().size()));
+        Num b2 = new Num();
+        b2.getList().addAll(b.getList().subList(0,m));
+
+        Num e = Num.product(a1,b1);
+        Num f = Num.product(a2, b2);
+        Num ef = Num.product(Num.add(a1, a2),Num.add(b1,b2));
+        Num efFinal= multiplyBase(Num.subtract(ef, Num.add(e,f)),m);
+        Num temp = Num.add(multiplyBase(e,2*m),efFinal);
+        return Num.add(temp,f);
+
+    }
+    private static Num multiplyBase(Num a, long n){
+        Num out = new Num();
+        List<Long> outList = out.getList();
+        outList.addAll(a.getList());
+        for(long i = 0; i < n; i++){
+            outList.add(0,0L);
+        }
+        return out;
+    }
+
+    private static Num multiply(Num a, Long b){
+        Num out = new Num();
+        List<Long> outList = out.getList();
+        Iterator<Long> num1Iteration = a.getList().iterator();
+        Long carry = 0L;
+        while(num1Iteration.hasNext()){
+            Long prod = (next(num1Iteration) * b) + carry;
+            List<Long> prodList = toBase(prod, base);
+            outList.add(prodList.get(0));
+            carry = prodList.size() > 1 ? prodList.get(1) : 0L;
+        }
+        if(carry > 0){
+            outList.add(carry);
+        }
+
+        return out;
+    }
+
+    private static List<Long> toBase(Long number, long base) {
+
+        List<Long> list = new LinkedList<>();
+
+        if (number < base) {
+            list.add(number);
+            if (number == 0L) {
+                list.add(0L);
+            }
+            return list;
+        }
+        Long quotient = number;
+        Long remainder = 0L;
+        while (quotient >= base) {
+            quotient = number / base;
+            remainder = number % base;
+            list.add(remainder);
+            number = quotient;
+        }
+        list.add(quotient);
+        return list;
     }
 
     // Use divide and conquer
@@ -295,10 +364,11 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num(999);
+        Num x = new Num("999999");
         Num y = new Num(80);
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
+        Num e = Num.product(x, y);
         System.out.println(d);
         System.out.println(z);
         Num a = Num.power(x, 8);
