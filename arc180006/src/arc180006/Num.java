@@ -6,6 +6,7 @@
 package arc180006;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Num implements Comparable<Num> {
 
@@ -246,14 +247,77 @@ public class Num implements Comparable<Num> {
         return null;
     }
 
+    private static Queue<String> convertStringListToQueue(String[] expr){
+        Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
+        return queue;
+    }
+
+    private static int precedenceLevel(char op) {
+        switch (op) {
+            case '+':
+            case '-':
+                return 0;
+            case '*':
+            case '/':
+                return 1;
+            case '^':
+                return 2;
+            default:
+                throw new IllegalArgumentException("Operator unknown: " + op);
+        }
+    }
+    private static int comparePrecedence(char opr1,char opr2){
+        if(precedenceLevel(opr1)==precedenceLevel(opr2))
+            return 0;
+        else if(precedenceLevel(opr1)>precedenceLevel(opr2))
+            return 1;
+        else
+            return -1;
+    }
     // Evaluate an expression in postfix and return resulting number
     // Each string is one of: "*", "+", "-", "/", "%", "^", "0", or
     // a number: [1-9][0-9]*. There is no unary minus operator.
     public static Num evaluatePostfix(String[] expr) {
-        return null;
-    }
+        Queue<String> qt = convertStringListToQueue(expr);
+        Queue<String> outputQueue = new LinkedList<>();
+        Stack<String> stack= new Stack<>();
+        String operatorRegex="[+-/*//]";
+        String operandRegex="([0-9])*";
+        Pattern operandPatten = Pattern.compile(operandRegex);
+        Pattern operatorPattern = Pattern.compile(operatorRegex);
+        while(!qt.isEmpty())
+        { 
+            String t = qt.remove();
+            if (operandPatten.matcher(t).matches())
+            {
+                outputQueue.add(t);
+            } 
+            else if(operatorPattern.matcher(t).matches())
+            {
+                int precedence = comparePrecedence(stack.peek().charAt(0),t.charAt(0));
+                if(stack.isEmpty() || precedence<0  || t=="("){
+                    stack.push(t);
+                }
+                else{
+                    outputQueue.add(stack.pop());
+                    stack.push(t);
+                }
+                
+            }
+            else if(t==")") 
+            {
+                while(stack.peek()!="(")
+                {
+                    outputQueue.add(stack.pop());
+                }
+                stack.pop();
+            }
+        }
+        while(stack.isEmpty())
+        {
+            outputQueue.add(stack.pop());
+        }
 
-    public static Num evaluateInfix(String[] expr) {
         return null;
     }
 
@@ -262,12 +326,13 @@ public class Num implements Comparable<Num> {
     // Tokenize the string and then input them to parser
     // Implementing this method correctly earns you an excellence credit
     public static Num evaluateExp(String expr) {
+        expr.replaceAll("\\s+","");
         Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
         return evalE(queue);
     }
 
     public static Num evaluateInfix(String[] expr) {
-        Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
+        Queue<String> queue = convertStringListToQueue(expr);
         return evalE(queue);
     }
 
@@ -388,9 +453,9 @@ public class Num implements Comparable<Num> {
     private static Num evalF(Queue<String> qt) {
         Num val;
         if ((qt.peek().equals("("))) {
-            String oper = qt.remove();
+            qt.remove();
             val = evalE(qt);
-            oper = qt.remove(); // ")""
+            qt.remove(); // ")""
         } else {
             String num = qt.remove();
             val = new Num(num);
@@ -413,6 +478,7 @@ public class Num implements Comparable<Num> {
                         "*", "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
                         "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
                         "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
+        Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321",  "5432109876543210987654321", "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*", "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-", "*", "+", "7896543", "*", "157984320", "+" });
         System.out.println(d);
         System.out.println(z);
         Num a = Num.power(x, 8);
