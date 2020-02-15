@@ -5,6 +5,7 @@
 // Change following line to your NetId
 package arc180006;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -262,6 +263,8 @@ public class Num implements Comparable<Num> {
                 return 1;
             case '^':
                 return 2;
+            case '(':
+                return -1;
             default:
                 throw new IllegalArgumentException("Operator unknown: " + op);
         }
@@ -279,9 +282,69 @@ public class Num implements Comparable<Num> {
     // a number: [1-9][0-9]*. There is no unary minus operator.
     public static Num evaluatePostfix(String[] expr) {
         Queue<String> qt = convertStringListToQueue(expr);
+        return evaluatePostfix(qt);
+    }
+    public static Num evaluatePostfix(Queue<String> qt){
+        Stack<Num> stack= new Stack<>();
+        String operatorRegex="[+-/*//]";
+        String operandRegex="([0-9])*";
+        Pattern operandPatten = Pattern.compile(operandRegex);
+        Pattern operatorPattern = Pattern.compile(operatorRegex);
+        Num out = null;
+        while(!qt.isEmpty())
+        {
+            String t = qt.remove();
+            if (operandPatten.matcher(t).matches())
+            {
+                stack.push(new Num(t));
+            } 
+            else if(operatorPattern.matcher(t).matches())
+            {
+                
+                Num b = stack.pop();
+                Num a = stack.pop();
+                switch(t)
+                {
+                   
+                    case "+":
+                        out = Num.add(a, b);
+                        break;
+                    case "-":
+                        out = Num.subtract(a, b);
+                        break;
+                    case "*":
+                        out = Num.product(a, b);
+                        break;
+                    case "/":
+                        out = Num.divide(a, b);
+                        break;
+                    case "^":
+                        // out = Num.power(a, b);
+                        break;
+                }
+                if(stack.size()==1 && qt.isEmpty()){
+                    break;
+                }
+                else{
+                    stack.push(out);
+                }
+                
+            }
+
+        }
+        if(out == null)
+        {
+            throw new NullPointerException("Invalid postfix expression");
+        }
+        return out;
+
+
+    }
+    public static Queue<String> infixToPostfix(String[] expr) {
+        Queue<String> qt = convertStringListToQueue(expr);
         Queue<String> outputQueue = new LinkedList<>();
         Stack<String> stack= new Stack<>();
-        String operatorRegex="[+-/*//]";
+        String operatorRegex="[+-/*//^]";
         String operandRegex="([0-9])*";
         Pattern operandPatten = Pattern.compile(operandRegex);
         Pattern operatorPattern = Pattern.compile(operatorRegex);
@@ -294,7 +357,7 @@ public class Num implements Comparable<Num> {
             } 
             else if(operatorPattern.matcher(t).matches())
             {
-                int precedence = comparePrecedence(stack.peek().charAt(0),t.charAt(0));
+                int precedence =  !stack.isEmpty()?comparePrecedence(stack.peek().charAt(0),t.charAt(0)):-1;
                 if(stack.isEmpty() || precedence<0  || t=="("){
                     stack.push(t);
                 }
@@ -312,13 +375,16 @@ public class Num implements Comparable<Num> {
                 }
                 stack.pop();
             }
+            else{
+                stack.push(t);
+            }
         }
-        while(stack.isEmpty())
+        while(!stack.isEmpty())
         {
             outputQueue.add(stack.pop());
         }
 
-        return null;
+        return outputQueue;
     }
 
     // Parse/evaluate an expression in infix and return resulting number
