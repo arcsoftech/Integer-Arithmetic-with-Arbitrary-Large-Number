@@ -81,10 +81,29 @@ public class Num implements Comparable<Num> {
 
         return out;
     }
-
-    // Use divide and conquer
+    
+	
     public static Num power(Num a, long n) {
-        return null;
+		if(n < 0)
+		{
+			n = subtract(new Num(0), n);
+			a = divide(1, a);
+		}
+		return powerHelper(a, n);
+    }
+
+    //use divide and conquer
+    private Num powerHelper(Num a, long N)
+    {
+        //base
+        if(n.compareTo(0) == 0) return 1;
+
+        //logic
+        Num temp = powerHelper(a, n / 2);
+        if(n % 2 == 0)
+            return multiply(temp,temp);
+        else
+            return multiply(a, multiply(temp,temp));
     }
 
     // Use binary search to calculate a/b
@@ -99,7 +118,26 @@ public class Num implements Comparable<Num> {
 
     // Use binary search
     public static Num squareRoot(Num a) {
-        return null;
+        //Edge Case
+        if(a == null) return null;
+
+        //Logic
+        Num l = new Num(0), h = new Num(a.by2());
+
+        while(compareNums(l , h) <= 1)
+        {
+            Num m = add(l, subtract(h, l).by2()); // calculate the mid point between l and h
+
+            Num x =  m.multiply(m);  // keep a temporary variable equal to the square of m
+
+            if(compareNum(x , a) == 1) return x; //found square root
+
+            else if(compareNum(x, a) < 1) // x less than target
+                l = add(m,1);
+
+            else  //x more than target
+                h = m.subtract(m,1);
+        }
     }
 
     // Utility functions
