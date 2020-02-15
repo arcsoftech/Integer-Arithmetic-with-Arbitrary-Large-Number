@@ -286,25 +286,166 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Method to divide two numbers
+     * slow divides, keep subtracting b from a until a < b, return number of subtraction
      * 
      * @param a - Number 1
-     * @param b - Number 2
+     * @param b
      * @return
      */
+
     public static Num divide(Num a, Num b) {
-        return null;
+    	boolean isNegative = a.isNegative ^ b.isNegative;
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	//take only absolute
+    	// corner cases
+    	if (b.compareTo(new Num(0)) == 0) { // b = 0
+    		throw new Error("cannot divide to 0");
+    	}
+    	if (a.compareTo(new Num(0)) == 0) { // a = 0
+    		return new Num(0);
+    	}
+    	if (b.compareTo(new Num(1)) == 0) { // b = 1
+    		return a;
+    	}
+    	if (b.compareTo(a) == 0) { // a = b
+    		return new Num(1);
+    	}
+    	if (b.compareTo(a) > 0) { // b > a
+    		return new Num(0);
+    	}
+    	Num count = new Num(0);
+    	Num one = new Num(1);
+    	do {
+        	a = subtract (a, b);
+        	count = add (count , one);
+    	} while (b.compareTo(a) <= 0); // do until a < b
+    	count.isNegative = isNegative;
+        return count;
+
     }
 
+     /**
+     * fast divide try to subtract as much as we can
+     * pad b with maximum number of zeros possible and then subtract
+     * @param a
+     * @param b
+     * @return
+     */
+    public static Num fastDivide(Num a, Num b) {
+    	boolean isNegative = a.isNegative ^ b.isNegative;
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	
+    	if (a.getList().get(a.getList().size() - 1) == 0) {
+    		a.getList().remove(a.getList().size() - 1);
+    	}
+    	if (b.getList().get(b.getList().size() - 1) == 0) {
+    		b.getList().remove(b.getList().size() - 1);
+    	}
+    	
+    	//take only absolute
+    	// corner cases
+    	if (b.compareTo(new Num(0)) == 0) { // b = 0
+    		throw new Error("cannot divide to 0");
+    	}
+    	if (a.compareTo(new Num(0)) == 0) { // a = 0
+    		return new Num(0);
+    	}
+    	if (b.compareTo(new Num(1)) == 0) { // b = 1
+    		return a;
+    	}
+    	if (b.compareTo(a) == 0) { // a = b
+    		return new Num(1);
+    	}
+    	if (b.compareTo(a) > 0) { // b > a
+    		return new Num(0);
+    	}
+    	Num quotient = new Num(0);
+    	Num one = new Num(1);
+    	
+    	
+    	do {
+    		Integer numZeros = getNumberOfPaddingZero(a, b);
+    		Num paddedB = getNumWithPaddingZero(b, numZeros);
+        	a = subtract (a, paddedB);
+        	quotient = add (quotient , tenPower(numZeros));
+    	} while (b.compareTo(a) <= 0); // do until a < b
+    	quotient.isNegative = isNegative;
+        return quotient;
+    }
+    
+    public static Num tenPower(Integer n) { // get 10^n in Num 
+    	if (n == 0) {
+    		return new Num(1);
+    	}
+    	int zeroArraySize = n / 5;
+    	int lastItemZeros = n % 5;
+    	int lastItem =  (int) Math.pow(10, lastItemZeros);
+    	Num result = new Num();
+    	for (int i = 1; i <= zeroArraySize; i++) {
+    		result.getList().add(0L);
+    	}
+    	result.getList().add((long)lastItem);
+    	
+    	return result;
+    }
+
+   /**
+    * Count Number of zeroes to pad
+    * @param a - Integer1
+    * @param b - Integer2
+    * @return - Integer
+    */
+   private static Integer getNumberOfPaddingZero(Num a, Num b) {
+		// precondition: a > b
+    	// number of zeros right padding to b to get largest c that smaller than a
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	if (a.getList().get(a.getList().size() - 1) == 0) {
+    		a.getList().remove(a.getList().size() - 1);
+    	}
+    	if (b.getList().get(b.getList().size() - 1) == 0) {
+    		b.getList().remove(b.getList().size() - 1);
+    	}
+    	int lastAItemLength = a.getList().get(a.getList().size() - 1).toString().length();
+    	int lastBItemLength = b.getList().get(b.getList().size() - 1).toString().length();
+    	int diff = lastAItemLength - lastBItemLength;
+    	Integer numZeros =  5 * (a.getList().size() - b.getList().size()) + diff;
+    	return a.compareTo(getNumWithPaddingZero(b, numZeros)) < 0 ? numZeros - 1 : numZeros;
+    	
+    }
+    
+    /**
+     * Helper method for padding zeroes
+     * @param a - Integer of type Num
+     * @param numZeros - # of zeroes to pad
+     * @return - Padded Integer of type Num
+     */
+    private static Num getNumWithPaddingZero(Num a, Integer numZeros) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(a);
+		for (int i = 1; i <= numZeros; i++) {
+			stringBuilder.append(0);
+		}
+		return new Num(stringBuilder.toString());
+    }
     /**
      * Method to return mod of two number
      * 
      * @param a
      * @param b
-     * @return
+     * @return - Innteger of type Num
      */
     public static Num mod(Num a, Num b) {
-        return null;
+        if (b.compareTo(new Num(0))==0) {
+    		return null;
+    	}
+
+    	int compare = a.compareTo(b);
+    	return compare == 0 ? new Num(0) 
+    			: compare < 0 ? a 
+    			: subtract (a, product(b, divide(a, b)));
     }
 
     /**
@@ -314,28 +455,27 @@ public class Num implements Comparable<Num> {
      * @return - Integer of type Num
      */
     public static Num squareRoot(Num a) {
-        // Edge Case
-        if (a == null)
-            return null;
+        //Edge Case
+        if(a == null) return null;
 
-        // Logic
+        //Logic
         Num l = new Num(0), h = a.by2();
 
-        while (l.compareTo(h) <= 1) {
+        while(l.compareTo(h) <= 1)
+        {
             Num m = add(l, subtract(h, l).by2()); // calculate the mid point between l and h
 
-            Num x = product(m, m); // keep a temporary variable equal to the square of m
+            Num x =  product(m, m);  // keep a temporary variable equal to the square of m
 
-            if (x.compareTo(a) == 0)
-                return x; // found square root
+            if(x.compareTo(a) == 0) return x; //found square root
 
-            else if (x.compareTo(a) < 0) // x less than target
+            else if(x.compareTo(a) < 0) // x less than target
                 l = add(m, new Num(1));
 
-            else // x more than target
+            else  //x more than target
                 h = subtract(m, new Num(1));
         }
-
+        
         return null;
     }
 
@@ -366,9 +506,15 @@ public class Num implements Comparable<Num> {
     public void printList() {
     }
 
-    // Return number to a string in base 10
+    /**
+     * Method to return Integer of type Num to string
+     */
     public String toString() {
-        return null;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Long item : this.list) {
+        	stringBuilder.insert(0, item);
+        }
+        return stringBuilder.toString().strip();
     }
 
     public long base() {
@@ -779,11 +925,12 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num("8099999999999999999999999999");
-        Num y = new Num("809999999999999999999999999999999999");
+        Num x = new Num("80000");
+        Num y = new Num("40000");
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
+        Num h = Num.divide(x, y);
         Num f = Num.evaluateInfix(
                 new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321", "*",
                         "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
