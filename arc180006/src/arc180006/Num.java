@@ -311,6 +311,93 @@ public class Num implements Comparable<Num> {
     	count.isNegative = isNegative;
         return count;
     }
+    
+    public static Num fastDivide(Num a, Num b) {
+    	boolean isNegative = a.isNegative ^ b.isNegative;
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	
+    	if (a.getList().get(a.getList().size() - 1) == 0) {
+    		a.getList().remove(a.getList().size() - 1);
+    	}
+    	if (b.getList().get(b.getList().size() - 1) == 0) {
+    		b.getList().remove(b.getList().size() - 1);
+    	}
+    	
+    	//take only absolute
+    	// corner cases
+    	if (b.compareTo(new Num(0)) == 0) { // b = 0
+    		throw new Error("cannot divide to 0");
+    	}
+    	if (a.compareTo(new Num(0)) == 0) { // a = 0
+    		return new Num(0);
+    	}
+    	if (b.compareTo(new Num(1)) == 0) { // b = 1
+    		return a;
+    	}
+    	if (b.compareTo(a) == 0) { // a = b
+    		return new Num(1);
+    	}
+    	if (b.compareTo(a) > 0) { // b > a
+    		return new Num(0);
+    	}
+    	Num quotient = new Num(0);
+    	Num one = new Num(1);
+    	
+    	
+    	do {
+    		Integer numZeros = getNumberOfPaddingZero(a, b);
+    		Num paddedB = getNumWithPaddingZero(b, numZeros);
+        	a = subtract (a, paddedB);
+        	quotient = add (quotient , tenPower(numZeros));
+    	} while (b.compareTo(a) <= 0); // do until a < b
+    	quotient.isNegative = isNegative;
+        return quotient;
+    }
+    
+    public static Num tenPower(Integer n) { // get 10^n in Num 
+    	if (n == 0) {
+    		return new Num(1);
+    	}
+    	int zeroArraySize = n / 5;
+    	int lastItemZeros = n % 5;
+    	int lastItem =  (int) Math.pow(10, lastItemZeros);
+    	Num result = new Num();
+    	for (int i = 1; i <= zeroArraySize; i++) {
+    		result.getList().add(0L);
+    	}
+    	result.getList().add((long)lastItem);
+    	
+    	return result;
+    }
+    
+    private static Integer getNumberOfPaddingZero(Num a, Num b) {
+		// precondition: a > b
+    	// number of zeros right padding to b to get largest c that smaller than a
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	if (a.getList().get(a.getList().size() - 1) == 0) {
+    		a.getList().remove(a.getList().size() - 1);
+    	}
+    	if (b.getList().get(b.getList().size() - 1) == 0) {
+    		b.getList().remove(b.getList().size() - 1);
+    	}
+    	int lastAItemLength = a.getList().get(a.getList().size() - 1).toString().length();
+    	int lastBItemLength = b.getList().get(b.getList().size() - 1).toString().length();
+    	int diff = lastAItemLength - lastBItemLength;
+    	Integer numZeros =  5 * (a.getList().size() - b.getList().size()) + diff;
+    	return a.compareTo(getNumWithPaddingZero(b, numZeros)) < 0 ? numZeros - 1 : numZeros;
+    	
+    }
+    
+    private static Num getNumWithPaddingZero(Num a, Integer numZeros) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(a);
+		for (int i = 1; i <= numZeros; i++) {
+			stringBuilder.append(0);
+		}
+		return new Num(stringBuilder.toString());
+    }
 
     // return a%b
     public static Num mod(Num a, Num b) {
@@ -376,9 +463,21 @@ public class Num implements Comparable<Num> {
 
     // Return number to a string in base 10
     public String toString() {
+    	List<Long> myList = this.list;
         StringBuilder stringBuilder = new StringBuilder();
-        for (Long item : this.list) {
-        	stringBuilder.insert(0, item);
+        
+        for (int i = 0; i < this.list.size(); i++) {
+        	if (this.list.get(i).toString().length() < 5 && i != this.list.size() - 1) {
+        		stringBuilder.insert(0, this.list.get(i).toString());
+        		for (int j = 1; j <= 5 - this.list.get(i).toString().length(); j++) {
+        			stringBuilder.insert(0, "0");
+        		}
+        	}else {
+        		stringBuilder.insert(0, this.list.get(i));
+        	}
+        }
+        if (this.isNegative) {
+        	stringBuilder.insert(0, "-");
         }
         return stringBuilder.toString().strip();
     }
@@ -684,10 +783,10 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-          Num x = new Num("80");
-          Num y = new Num("3");
-          System.out.println("=" + divide(x, y).toString());
-          System.out.println("mod" + mod(x, y).toString());
+          Num x = new Num("12345678923456789");
+          Num y = new Num("-111222");
+          System.out.println("=" + fastDivide(x, y).toString());
+//          System.out.println("mod" + mod(x, y).toString());
 //        Num z = Num.add(x, y);
 //        Num d = Num.subtract(x, y);
 //        Num e = Num.product(x, y);
