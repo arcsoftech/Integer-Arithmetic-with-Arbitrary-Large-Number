@@ -237,50 +237,13 @@ public class Num implements Comparable<Num> {
         else
             return product(a, product(temp,temp));
     }
-
-    // Ucalculate quotient of a divides b (integer division)
-//    public static Num divide(Num a, Num b) {
-//    	// corner cases
-//    	if (b.compareTo(new Num(0)) == 0) { // b = 0
-//    		throw new Error("cannot divide to 0");
-//    	}
-//    	if (b.compareTo(new Num(1)) == 0) { // b = 1
-//    		return a;
-//    	}
-//    	if (b.compareTo(a) == 0) { // a = b
-//    		return new Num(1);
-//    	}
-//    	if (b.compareTo(a) > 0) { // b > a
-//    		return new Num(0);
-//    	}
-//    	StringBuilder resultString = new StringBuilder();
-//    	
-//    	do {
-//        	Num estimate = getSmallestLargerNumber(a, b);
-//        	
-//        	if (a.compareTo(product(b, estimate)) > 0) { // a > b * estimate
-//        		estimate = subtract(estimate, new Num(1));
-//        	}
-//        	a = subtract(a, product(b, estimate));
-//        	resultString.append(estimate.toString());
-//    	} while (b.compareTo(a) <= 0); // do until b > a
-//    	
-//        return new Num(resultString.toString());
-//    }
-//    
-//    public static Num getSmallestLargerNumber(Num a, Num b) {
-//    	// precondition: Num a > Num b
-//    	// postcondition: a smallest Num c part of a and larger than Num b
-//    	Num result = new Num();
-//    	int fromIndex = b.getList().size() - a.getList().size();
-//    	result.getList().addAll(a.getList().subList(fromIndex, b.getList().size()-1));
-//    	
-//    	if (result.compareTo(b) < 0) {
-//    		result.getList().add(0, a.getList().get(fromIndex-1));
-//    	}
-//    	return result;
-//    }
     
+    /**
+     * slow divides, keep subtracting b from a until a < b, return number of subtraction
+     * @param a
+     * @param b
+     * @return
+     */
     public static Num divide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
@@ -312,6 +275,13 @@ public class Num implements Comparable<Num> {
         return count;
     }
     
+    /**
+     * fast divide try to subtract as much as we can
+     * pad b with maximum number of zeros possible and then subtract
+     * @param a
+     * @param b
+     * @return
+     */
     public static Num fastDivide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
