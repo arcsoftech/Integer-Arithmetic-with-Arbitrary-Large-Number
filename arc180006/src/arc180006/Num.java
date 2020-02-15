@@ -5,7 +5,6 @@
 // Change following line to your NetId
 package arc180006;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -66,6 +65,36 @@ public class Num implements Comparable<Num> {
             }
         }
     }
+
+//    public Num(long x) {
+//        isNegative = false;
+//
+//		// When x is Negative, making it positive with flag isNegative as true
+//		if (x < 0) {
+//			this.isNegative = true;
+//			x = -1 * x;
+//		}
+//		double lengthArr = 0;
+//
+//		// When x = 0, lengthArr = -Infinity
+//		if (x == 0) {
+//			lengthArr = 1;
+//		}
+//		// No of digits in this.Num = log_base (x) + 1 = log(x)/log(base) + 1
+//		else {
+//			lengthArr = ((Math.log((double) x)) / (Math.log((double) base))) + 1;
+//		}
+//
+//		this.len = (int) lengthArr; // Real to integer (floor function)
+//		arr = new long[this.len];
+//
+//		long n = x;
+//		// Iteratively pass appropriate digit to this.arr (array of long)
+//		for (int i = 0; i < len; i++) {
+//			arr[i] = n % base();
+//			n /= base();
+//		}
+//    }
 
     public static Num add(Num a, Num b) {
         Num out = null;
@@ -186,7 +215,27 @@ public class Num implements Comparable<Num> {
 
     // Use divide and conquer
     public static Num power(Num a, long n) {
-        return null;
+		if(n < 0)
+		{
+//			nNum = subtract(new Num(0), nNum);
+//			a = divide(new Num(1), a);
+			return new Num(0); // we do not deal with fraction, only int division
+		}
+		return powerHelper(a, n);
+    }
+
+    //use divide and conquer
+    private static Num powerHelper(Num a, long n)
+    {
+        //base
+        if(n == 0) return new Num(1);
+
+        //logic
+        Num temp = powerHelper(a, n / 2);
+        if(n % 2 == 0)
+            return product(temp,temp);
+        else
+            return product(a, product(temp,temp));
     }
 
     // Use binary search to calculate a/b
@@ -201,6 +250,27 @@ public class Num implements Comparable<Num> {
 
     // Use binary search
     public static Num squareRoot(Num a) {
+        //Edge Case
+        if(a == null) return null;
+
+        //Logic
+        Num l = new Num(0), h = a.by2();
+
+        while(l.compareTo(h) <= 1)
+        {
+            Num m = add(l, subtract(h, l).by2()); // calculate the mid point between l and h
+
+            Num x =  product(m, m);  // keep a temporary variable equal to the square of m
+
+            if(x.compareTo(a) == 0) return x; //found square root
+
+            else if(x.compareTo(a) < 0) // x less than target
+                l = add(m, new Num(1));
+
+            else  //x more than target
+                h = subtract(m, new Num(1));
+        }
+        
         return null;
     }
 
