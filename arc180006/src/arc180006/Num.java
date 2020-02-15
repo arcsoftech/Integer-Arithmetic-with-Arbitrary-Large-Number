@@ -238,14 +238,89 @@ public class Num implements Comparable<Num> {
             return product(a, product(temp,temp));
     }
 
-    // Use binary search to calculate a/b
+    // Ucalculate quotient of a divides b (integer division)
+//    public static Num divide(Num a, Num b) {
+//    	// corner cases
+//    	if (b.compareTo(new Num(0)) == 0) { // b = 0
+//    		throw new Error("cannot divide to 0");
+//    	}
+//    	if (b.compareTo(new Num(1)) == 0) { // b = 1
+//    		return a;
+//    	}
+//    	if (b.compareTo(a) == 0) { // a = b
+//    		return new Num(1);
+//    	}
+//    	if (b.compareTo(a) > 0) { // b > a
+//    		return new Num(0);
+//    	}
+//    	StringBuilder resultString = new StringBuilder();
+//    	
+//    	do {
+//        	Num estimate = getSmallestLargerNumber(a, b);
+//        	
+//        	if (a.compareTo(product(b, estimate)) > 0) { // a > b * estimate
+//        		estimate = subtract(estimate, new Num(1));
+//        	}
+//        	a = subtract(a, product(b, estimate));
+//        	resultString.append(estimate.toString());
+//    	} while (b.compareTo(a) <= 0); // do until b > a
+//    	
+//        return new Num(resultString.toString());
+//    }
+//    
+//    public static Num getSmallestLargerNumber(Num a, Num b) {
+//    	// precondition: Num a > Num b
+//    	// postcondition: a smallest Num c part of a and larger than Num b
+//    	Num result = new Num();
+//    	int fromIndex = b.getList().size() - a.getList().size();
+//    	result.getList().addAll(a.getList().subList(fromIndex, b.getList().size()-1));
+//    	
+//    	if (result.compareTo(b) < 0) {
+//    		result.getList().add(0, a.getList().get(fromIndex-1));
+//    	}
+//    	return result;
+//    }
+    
     public static Num divide(Num a, Num b) {
-        return null;
+    	boolean isNegative = a.isNegative ^ b.isNegative;
+    	a.isNegative = false;
+    	b.isNegative = false;
+    	//take only absolute
+    	// corner cases
+    	if (b.compareTo(new Num(0)) == 0) { // b = 0
+    		throw new Error("cannot divide to 0");
+    	}
+    	if (a.compareTo(new Num(0)) == 0) { // a = 0
+    		return new Num(0);
+    	}
+    	if (b.compareTo(new Num(1)) == 0) { // b = 1
+    		return a;
+    	}
+    	if (b.compareTo(a) == 0) { // a = b
+    		return new Num(1);
+    	}
+    	if (b.compareTo(a) > 0) { // b > a
+    		return new Num(0);
+    	}
+    	Num count = new Num(0);
+    	Num one = new Num(1);
+    	do {
+        	a = subtract (a, b);
+        	count = add (count , one);
+    	} while (b.compareTo(a) <= 0); // do until a < b
+    	count.isNegative = isNegative;
+        return count;
     }
 
     // return a%b
     public static Num mod(Num a, Num b) {
-        return null;
+    	if (b.compareTo(new Num(0))==0) {
+    		return null;
+    	}
+    	int compare = a.compareTo(b);
+    	return compare == 0 ? new Num(0) 
+    			: compare < 0 ? a 
+    			: subtract (a, product(b, divide(a, b)));
     }
 
     // Use binary search
@@ -301,7 +376,11 @@ public class Num implements Comparable<Num> {
 
     // Return number to a string in base 10
     public String toString() {
-        return null;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Long item : this.list) {
+        	stringBuilder.insert(0, item);
+        }
+        return stringBuilder.toString().strip();
     }
 
     public long base() {
@@ -605,22 +684,24 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num("999999");
-        Num y = new Num(80);
-        Num z = Num.add(x, y);
-        Num d = Num.subtract(x, y);
-        Num e = Num.product(x, y);
-        Num f = Num.evaluateInfix(new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321",
-                        "*", "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
-                        "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
-                        "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
-        Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321",  "5432109876543210987654321", "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*", "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-", "*", "+", "7896543", "*", "157984320", "+" });
-        System.out.println(d);
-        System.out.println(z);
-        Num a = Num.power(x, 8);
-        System.out.println(a);
-        if (z != null)
-            z.printList();
+          Num x = new Num("80");
+          Num y = new Num("3");
+          System.out.println("=" + divide(x, y).toString());
+          System.out.println("mod" + mod(x, y).toString());
+//        Num z = Num.add(x, y);
+//        Num d = Num.subtract(x, y);
+//        Num e = Num.product(x, y);
+//        Num f = Num.evaluateInfix(new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321",
+//                        "*", "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
+//                        "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
+//                        "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
+//        Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321",  "5432109876543210987654321", "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*", "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-", "*", "+", "7896543", "*", "157984320", "+" });
+//        System.out.println(d);
+//        System.out.println(z);
+//        Num a = Num.power(x, 8);
+//        System.out.println(a);
+//        if (z != null)
+//            z.printList();
     }
 
 }
