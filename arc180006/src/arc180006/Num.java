@@ -1,8 +1,11 @@
 
-// Starter code for lp1.
-// Version 1.0 (Monday, Jan 27).
+/**
+ * Integer Arithmetic for arbitarary large integres.
+ *
+ *  @author Arihant Chhajed, Cuong Ngo , Bushan Vaishist
+ *  Ver 1.0: 2020/01/27
+ */
 
-// Change following line to your NetId
 package arc180006;
 
 import java.util.*;
@@ -49,6 +52,7 @@ public class Num implements Comparable<Num> {
         }
         this.list = num.list;
     }
+
 
     /**
      * Convert given long integer to long arrya with provided base
@@ -709,11 +713,40 @@ public class Num implements Comparable<Num> {
      * @return - Integer of type Num
      */
     public static Num evaluateExp(String expr) {
-        expr.replaceAll("\\s+", "");
-        Queue<String> queue = new LinkedList<>(Arrays.asList(expr));
-        return evalE(queue);
-    }
+        expr = expr.replaceAll("\\s+", "");
+        // Queue<String> queue = new LinkedList<>(Arrays.asList(expr.split(" ")));
+        // return evalE(queue);
+        char[] arr = new StringBuilder(expr).toString().toCharArray();
+        List<String> output = new ArrayList<String>();
+        StringBuilder numbers= new StringBuilder();
+        for (char current : arr) {
+            String token = String.valueOf(current);
+           if(token.equals("(")  || token.equals(")") || isOperator(token))
+           {
+               if(numbers.length()>0)
+               {
+                output.add(numbers.toString());
+                numbers = new StringBuilder();
+               }
+               output.add(token);
+           }
+           else{
+                numbers.append(token);
+           }
+        }
+        if(numbers.toString() != "")
+        {
+         output.add(numbers.toString());
+        }
+        return evaluateInfix(output.toArray(new String[output.size()]));
 
+    }
+    private static  Boolean isOperator(String c){
+        String operatorRegex = "[+-/*//]"; // Regex to detect operator
+        Pattern operatorPattern = Pattern.compile(operatorRegex);
+        return operatorPattern.matcher(c).matches();
+
+    }
     /**
      * Parse/evaluate an expression in infix and return resulting number.
      * 
@@ -886,8 +919,7 @@ public class Num implements Comparable<Num> {
      */
     private static Num evalT(Queue<String> qt) {
         Num val1 = evalF(qt);
-        if (!qt.isEmpty()) {
-            while ((qt.peek().equals("*")) || (qt.peek().equals("/"))) {
+            while (!qt.isEmpty() && ((qt.peek().equals("*")) || (qt.peek().equals("/")))) {
                 String oper = qt.remove();
                 Num val2 = evalF(qt);
                 if (oper.equals("*"))
@@ -895,8 +927,6 @@ public class Num implements Comparable<Num> {
                 else
                     val1 = Num.divide(val1, val2);
             }
-        }
-
         return val1;
     }
 
@@ -940,6 +970,9 @@ public class Num implements Comparable<Num> {
                 "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*",
                 "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-",
                 "*", "+", "7896543", "*", "157984320", "+" });
+
+        e = evaluateExp("(3+4) * 5");
+        e = evaluateExp("( 3 + 4 ) *5");
         System.out.println(d);
         System.out.println(z);
         Num a = Num.power(x, 8);
