@@ -265,13 +265,15 @@ public class Num implements Comparable<Num> {
      * @return - Integer of type Num
      */
     public static Num power(Num a, long n) {
-        if (n < 0) {
-            // nNum = subtract(new Num(0), nNum);
-            // a = divide(new Num(1), a);
-            return new Num(0); // we do not deal with fraction, only int division
-        }
-        return powerHelper(a, n);
+		if(n < 0)
+		{
+//			nNum = subtract(new Num(0), nNum);
+//			a = divide(new Num(1), a);
+			return new Num(0); // we do not deal with fraction, only int division
+		}
+		return powerHelper(a, n);
     }
+    
 
     /**
      * Method to generate power of number using divide and conquer
@@ -301,7 +303,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
 
-    public static Num divide(Num a, Num b) {
+    public static Num slowDivide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
     	b.isNegative = false;
@@ -340,7 +342,7 @@ public class Num implements Comparable<Num> {
      * @param b
      * @return
      */
-    public static Num fastDivide(Num a, Num b) {
+    public static Num divide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
     	b.isNegative = false;
@@ -377,6 +379,9 @@ public class Num implements Comparable<Num> {
     		Integer numZeros = getNumberOfPaddingZero(a, b);
     		Num paddedB = getNumWithPaddingZero(b, numZeros);
         	a = subtract (a, paddedB);
+//        	if (a.getList().get(a.getList().size() - 1) == 0) {
+//        		a.getList().remove(a.getList().size() - 1);
+//        	}
         	quotient = add (quotient , tenPower(numZeros));
     	} while (b.compareTo(a) <= 0); // do until a < b
     	quotient.isNegative = isNegative;
@@ -449,7 +454,6 @@ public class Num implements Comparable<Num> {
         if (b.compareTo(new Num(0))==0) {
     		return null;
     	}
-
     	int compare = a.compareTo(b);
     	return compare == 0 ? new Num(0) 
     			: compare < 0 ? a 
@@ -519,9 +523,21 @@ public class Num implements Comparable<Num> {
      * Method to return Integer of type Num to string
      */
     public String toString() {
+    	List<Long> myList = this.list;
         StringBuilder stringBuilder = new StringBuilder();
-        for (Long item : this.list) {
-        	stringBuilder.insert(0, item);
+        
+        for (int i = 0; i < this.list.size(); i++) {
+        	if (this.list.get(i).toString().length() < 5 && i != this.list.size() - 1) {
+        		stringBuilder.insert(0, this.list.get(i).toString());
+        		for (int j = 1; j <= 5 - this.list.get(i).toString().length(); j++) {
+        			stringBuilder.insert(0, "0");
+        		}
+        	}else {
+        		stringBuilder.insert(0, this.list.get(i));
+        	}
+        }
+        if (this.isNegative) {
+        	stringBuilder.insert(0, "-");
         }
         return stringBuilder.toString().strip();
     }
@@ -537,7 +553,7 @@ public class Num implements Comparable<Num> {
 
     // Divide by 2, for using in binary search
     public Num by2() {
-        return fastDivide(this, new Num("2"));
+        return divide(this, new Num("2"));
     }
 
     /**
