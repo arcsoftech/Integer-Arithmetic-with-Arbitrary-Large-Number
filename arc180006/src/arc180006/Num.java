@@ -375,6 +375,9 @@ public class Num implements Comparable<Num> {
     		Integer numZeros = getNumberOfPaddingZero(a, b);
     		Num paddedB = getNumWithPaddingZero(b, numZeros);
         	a = subtract (a, paddedB);
+//        	if (a.getList().get(a.getList().size() - 1) == 0) {
+//        		a.getList().remove(a.getList().size() - 1);
+//        	}
         	quotient = add (quotient , tenPower(numZeros));
     	} while (b.compareTo(a) <= 0); // do until a < b
     	quotient.isNegative = isNegative;
