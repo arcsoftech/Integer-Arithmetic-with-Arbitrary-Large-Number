@@ -553,7 +553,7 @@ public class Num implements Comparable<Num> {
 
     // Divide by 2, for using in binary search
     public Num by2() {
-        return fastDivide(this, new Num("2"));
+        return divide(this, new Num("2"));
     }
 
     /**
