@@ -532,7 +532,7 @@ public class Num implements Comparable<Num> {
 
     // Divide by 2, for using in binary search
     public Num by2() {
-        return null;
+        return divide(this, new Num("2"));
     }
 
     /**
@@ -973,6 +973,8 @@ public class Num implements Comparable<Num> {
 
         e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
         e = evaluateExp("( 3 + 4 ) *5");
+        e= power(new Num("56"),56L);
+        e = squareRoot(new Num("64"));
         System.out.println(d);
         System.out.println(z);
         Num a = Num.power(x, 8);
