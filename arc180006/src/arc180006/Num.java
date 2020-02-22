@@ -299,7 +299,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
 
-    public static Num divide(Num a, Num b) {
+    public static Num slowDivide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
     	b.isNegative = false;
@@ -338,7 +338,7 @@ public class Num implements Comparable<Num> {
      * @param b
      * @return
      */
-    public static Num fastDivide(Num a, Num b) {
+    public static Num divide(Num a, Num b) {
     	boolean isNegative = a.isNegative ^ b.isNegative;
     	a.isNegative = false;
     	b.isNegative = false;
