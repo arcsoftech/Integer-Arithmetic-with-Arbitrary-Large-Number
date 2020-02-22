@@ -192,7 +192,8 @@ public class Num implements Comparable<Num> {
     private static Num multiplyBase(Num a, long n) {
         Num out = new Num();
         List<Long> outList = out.getList();
-        outList.addAll(a.getList());
+        if(a.compareTo(new Num(0L))!=0)
+            outList.addAll(a.getList());
         for (long i = 0; i < n; i++) {
             outList.add(0, 0L);
         }
@@ -955,8 +956,8 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num("80000");
-        Num y = new Num("40000");
+        Num x = new Num("1111111111111111");
+        Num y = new Num("123456700000000");
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
@@ -973,12 +974,10 @@ public class Num implements Comparable<Num> {
 
         e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
         e = evaluateExp("( 3 + 4 ) *5");
-        e= power(new Num("56"),56L);
+        e= power(new Num("56"),5L);
         e = squareRoot(new Num("64"));
         System.out.println(d);
         System.out.println(z);
-        Num a = Num.power(x, 8);
-        System.out.println(a);
         if (z != null)
             z.printList();
     }
