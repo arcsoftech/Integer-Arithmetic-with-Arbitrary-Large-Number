@@ -463,29 +463,30 @@ public class Num implements Comparable<Num> {
      * @return - Integer of type Num
      */
     public static Num squareRoot(Num a) {
-        //Edge Case
-        if(a == null) return null;
+       //Edge Case
+       if(a.isNegative) return null;
 
-        //Logic
-        Num l = new Num(0), h = a.by2();
+       //Logic
+       if(a.compareTo(new Num(2)) < 0) return a;
+       Num l = new Num(2), h = a.by2();
 
-        while(l.compareTo(h) <= 1)
-        {
-            Num m = add(l, subtract(h, l).by2()); // calculate the mid point between l and h
+       while(l.compareTo(h) < 1)
+       {
+           Num m = add(l, subtract(h, l).by2()); // calculate the mid point between l and h  - l + (h-l)/2
 
-            Num x =  product(m, m);  // keep a temporary variable equal to the square of m
+           Num x =  product(m, m);  // keep a temporary variable equal to the square of m
 
-            if(x.compareTo(a) == 0) return x; //found square root
+           if(x.compareTo(a) == 0) return m; //found square root
 
-            else if(x.compareTo(a) < 0) // x less than target
-                l = add(m, new Num(1));
+           else if(x.compareTo(a) < 0) // x less than target
+               l = add(m, new Num(1));
 
-            else  //x more than target
-                h = subtract(m, new Num(1));
-        }
-        
-        return null;
-    }
+           else  //x more than target
+               h = subtract(m, new Num(1));
+       }
+       
+       return h;
+   }
 
     /**
      * Method to compare number wit its own instance
@@ -536,7 +537,7 @@ public class Num implements Comparable<Num> {
 
     // Divide by 2, for using in binary search
     public Num by2() {
-        return divide(this, new Num("2"));
+        return fastDivide(this, new Num("2"));
     }
 
     /**
@@ -968,7 +969,7 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num("1111111111111111");
+        Num x = new Num("15241383936‬");
         Num y = new Num("123456700000000");
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
@@ -986,8 +987,8 @@ public class Num implements Comparable<Num> {
 
         // e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
         // e = evaluateExp("( 3 + 4 ) *5");
-        e= power(new Num("56"),5L);
-        // e = squareRoot(new Num("64"));
+        // e= power(new Num("56"),5L);
+        e = squareRoot(new Num("15241383936"));
         System.out.println(d);
         System.out.println(e);
         if (z != null)
