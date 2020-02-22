@@ -21,10 +21,10 @@ public class Num implements Comparable<Num> {
     int len; // actual number of elements of array that are used; number is stored in
              // arr[0..len-1]
 
-    private List<Long> list;
+//    private List<Long> list;
 
     Num() {
-        list = new LinkedList<>();
+        arr = new long[0];
     }
 
     /**
@@ -37,7 +37,7 @@ public class Num implements Comparable<Num> {
         if (s.length() == 0) {
             throw new NullPointerException("Invalid number");
         }
-        list = new ArrayList<>();
+        arr = new long[arrayLength(s)];
         Num Base = new Num(10);
         char[] arr = new StringBuilder(s).toString().toCharArray();
         Num num = this;
@@ -50,7 +50,7 @@ public class Num implements Comparable<Num> {
                 num = Num.add(first, second);
             }
         }
-        this.list = num.list;
+        this.arr = num.arr;
     }
 
 
@@ -60,25 +60,38 @@ public class Num implements Comparable<Num> {
      * @param x - Long Integer
      */
     public Num(long x) {
-        list = new LinkedList<>();
+        arr = new long[1];
         long quotient = base + 1, remainder = 0;
         if (x < 0) {
             this.isNegative = true;
             x = Math.abs(x);
         }
         if (x < base) {
-            list.add(x);
+            arr[0] = x;
         } else {
-            while (x >= base) {
+            
+        	int i = 0;
+        	while (x >= base) {
                 quotient = x / base;
                 remainder = x % base;
-                list.add(remainder);
+                arr[i] = remainder;
+//                list.add(remainder);
                 x = quotient;
+                i++;
             }
             if (quotient != 0) {
-                list.add(quotient);
+//                list.add(quotient);
+            	arr[i] = quotient;
             }
         }
+    }
+    
+    private int arrayLength(String s) {
+    	return s.length() % 5 == 0 ? s.length()/5 : s.length()/5 + 1;
+    }
+    
+    private int arrayLength(Long s) {
+    	return arrayLength(s.toString());
     }
 
     /**
@@ -137,7 +150,7 @@ public class Num implements Comparable<Num> {
      */
     public static Num product(Num a, Num b) {
         Num out = null;
-        if (a.getList().size() == 0 || b.getList().size() == 0) {
+        if (a.getList().length == 0 || b.getList().length == 0) {
             return new Num(0L);
         }
         out = karatsuba(a, b);
@@ -156,20 +169,24 @@ public class Num implements Comparable<Num> {
      */
     private static Num karatsuba(Num a, Num b) {
         // Single number multiplication- Base Case
-        if (b.getList().size() == 1) {
-            return multiply(a, b.getList().get(0));
+        if (b.getList().length == 1) {
+            return multiply(a, b.getList()[0]);
         }
 
         // Recursive method
-        int m = b.getList().size() / 2;
+        int m = b.getList().length / 2;
         Num a1 = new Num();
-        a1.getList().addAll(a.getList().subList(m, a.getList().size())); // First half of a
+//        a1.getList().addAll(a.getList().subList(m, a.getList().length)); // First half of a
+        System.arraycopy(a.getList(), m, a1, 0, a.getList().length - m);
         Num a2 = new Num();
-        a2.getList().addAll(a.getList().subList(0, m)); // Second half of b
+//        a2.getList().addAll(a.getList().subList(0, m)); // Second half of b
+        System.arraycopy(a.getList(), 0, a2, 0, m);
         Num b1 = new Num();
-        b1.getList().addAll(b.getList().subList(m, b.getList().size())); // First half of b
+//        b1.getList().addAll(b.getList().subList(m, b.getList().length)); // First half of b
+        System.arraycopy(b.getList(), m, b1, 0, b.getList().length - m);
         Num b2 = new Num();
-        b2.getList().addAll(b.getList().subList(0, m)); // Second half of b
+//        b2.getList().addAll(b.getList().subList(0, m)); // Second half of b
+        System.arraycopy(b.getList(), 0, b2, 0, m);
 
         // Karatsubna terms
         Num e = Num.product(a1, b1);
@@ -191,16 +208,34 @@ public class Num implements Comparable<Num> {
      */
     private static Num multiplyBase(Num a, long n) {
         Num out = new Num();
-        List<Long> outList = out.getList();
+        long[] outList = out.getList();
         if(a.compareTo(new Num(0L))!=0)
         {
-            outList.addAll(a.getList());
+//            outList.addAll(a.getList());
+        	System.arraycopy(a.getList(), 0, outList, 0, a.getList().length);
+        	
+        	int j = a.getList().length;
             for (long i = 0; i < n; i++) {
-                outList.add(0, 0L);
+//                outList.add(0, 0L);
+            	outList = insertAt0(outList, 0L);
             }
         }
             
         return out;
+    }
+    
+    private static long[] insertAt0(long[] array, long item) {
+    	long[] newArray = new long[array.length+1];
+    	newArray[0] = item;
+    	System.arraycopy(array, 0, newArray, 1, array.length);
+    	return newArray;
+    }
+    
+    private static long[] insertAtEnd(long[] array, long item) {
+    	long[] newArray = new long[array.length+1];
+    	System.arraycopy(array, 0, newArray, 0, array.length);
+    	newArray[array.length] = item;
+    	return newArray;
     }
 
     /**
@@ -212,17 +247,22 @@ public class Num implements Comparable<Num> {
      */
     private static Num multiply(Num a, Long b) {
         Num out = new Num();
-        List<Long> outList = out.getList();
-        Iterator<Long> num1Iterator = a.getList().iterator();
+        long[] outList = out.getList();
+//        Iterator<Long> num1Iterator = a.getList().iterator();
         Long carry = 0L;
-        while (num1Iterator.hasNext()) {
-            Long prod = (next(num1Iterator) * b) + carry;
-            List<Long> prodList = toBase(prod, base);
-            outList.add(prodList.get(0));
-            carry = prodList.size() > 1 ? prodList.get(1) : 0L;
+//        while (num1Iterator.hasNext()) {
+        for(int i = 0; i < a.getList().length; i++) {
+            long prod = (a.getList()[i] * b) + carry;
+            long[] prodList = toBase(prod, base);
+//            outList.add(prodList.get(0));
+            outList = insertAtEnd(outList, prodList[0]);
+            
+//            carry = prodList.size() > 1 ? prodList.get(1) : 0L;
+            carry = prodList.length > 1 ? prodList[1] : 0L;
         }
         if (carry > 0) {
-            outList.add(carry);
+//            outList.add(carry);
+            outList = insertAtEnd(outList, carry);
         }
         return out;
     }
@@ -234,14 +274,16 @@ public class Num implements Comparable<Num> {
      * @param base
      * @return - Integer of type Num
      */
-    private static List<Long> toBase(Long number, long base) {
+    private static long[] toBase(Long number, long base) {
 
-        List<Long> list = new LinkedList<>();
+        long[] list = new long[0];
 
         if (number < base) {
-            list.add(number);
+//            list.add(number);
+        	list = insertAtEnd(list, number);
             if (number == 0L) {
-                list.add(0L);
+//                list.add(0L);
+            	list = insertAtEnd(list, 0L);
             }
             return list;
         }
@@ -250,10 +292,13 @@ public class Num implements Comparable<Num> {
         while (quotient >= base) {
             quotient = number / base;
             remainder = number % base;
-            list.add(remainder);
+//            list.add(remainder);
+            list = insertAtEnd(list, remainder);
             number = quotient;
         }
-        list.add(quotient);
+//        list.add(quotient);
+        list = insertAtEnd(list, quotient);
+
         return list;
     }
 
@@ -347,12 +392,12 @@ public class Num implements Comparable<Num> {
     	a.isNegative = false;
     	b.isNegative = false;
     	
-    	if (a.getList().get(a.getList().size() - 1) == 0) {
-    		a.getList().remove(a.getList().size() - 1);
-    	}
-    	if (b.getList().get(b.getList().size() - 1) == 0) {
-    		b.getList().remove(b.getList().size() - 1);
-    	}
+//    	if (a.getList().get(a.getList().length - 1) == 0) {
+//    		a.getList().remove(a.getList().length - 1);
+//    	}
+//    	if (b.getList().get(b.getList().length - 1) == 0) {
+//    		b.getList().remove(b.getList().length - 1);
+//    	}
     	
     	//take only absolute
     	// corner cases
@@ -379,8 +424,8 @@ public class Num implements Comparable<Num> {
     		Integer numZeros = getNumberOfPaddingZero(a, b);
     		Num paddedB = getNumWithPaddingZero(b, numZeros);
         	a = subtract (a, paddedB);
-//        	if (a.getList().get(a.getList().size() - 1) == 0) {
-//        		a.getList().remove(a.getList().size() - 1);
+//        	if (a.getList().get(a.getList().length - 1) == 0) {
+//        		a.getList().remove(a.getList().length - 1);
 //        	}
         	quotient = add (quotient , tenPower(numZeros));
     	} while (b.compareTo(a) <= 0); // do until a < b
@@ -397,9 +442,11 @@ public class Num implements Comparable<Num> {
     	int lastItem =  (int) Math.pow(10, lastItemZeros);
     	Num result = new Num();
     	for (int i = 1; i <= zeroArraySize; i++) {
-    		result.getList().add(0L);
+//    		result.getList().add(0L);
+    		result.setList(insertAtEnd(result.getList(), 0L));
     	}
-    	result.getList().add((long)lastItem);
+//    	result.getList().add((long)lastItem);
+    	result.setList(insertAtEnd(result.getList(), lastItem));
     	
     	return result;
     }
@@ -415,16 +462,18 @@ public class Num implements Comparable<Num> {
     	// number of zeros right padding to b to get largest c that smaller than a
     	a.isNegative = false;
     	b.isNegative = false;
-    	if (a.getList().get(a.getList().size() - 1) == 0) {
-    		a.getList().remove(a.getList().size() - 1);
-    	}
-    	if (b.getList().get(b.getList().size() - 1) == 0) {
-    		b.getList().remove(b.getList().size() - 1);
-    	}
-    	int lastAItemLength = a.getList().get(a.getList().size() - 1).toString().length();
-    	int lastBItemLength = b.getList().get(b.getList().size() - 1).toString().length();
+//    	if (a.getList().get(a.getList().length - 1) == 0) {
+//    		a.getList().remove(a.getList().length - 1);
+//    	}
+//    	if (b.getList().get(b.getList().length - 1) == 0) {
+//    		b.getList().remove(b.getList().length - 1);
+//    	}
+//    	int lastAItemLength = a.getList().get(a.getList().length - 1).toString().length();
+//    	int lastBItemLength = b.getList().get(b.getList().length - 1).toString().length();
+    	int lastAItemLength = ((Long) a.getList()[a.getList().length - 1]).toString().length();
+    	int lastBItemLength = ((Long) b.getList()[b.getList().length - 1]).toString().length();
     	int diff = lastAItemLength - lastBItemLength;
-    	Integer numZeros =  5 * (a.getList().size() - b.getList().size()) + diff;
+    	Integer numZeros =  5 * (a.getList().length - b.getList().length) + diff;
     	return a.compareTo(getNumWithPaddingZero(b, numZeros)) < 0 ? numZeros - 1 : numZeros;
     	
     }
@@ -523,17 +572,17 @@ public class Num implements Comparable<Num> {
      * Method to return Integer of type Num to string
      */
     public String toString() {
-    	List<Long> myList = this.list;
+    	long[] myList = this.arr;
         StringBuilder stringBuilder = new StringBuilder();
         
-        for (int i = 0; i < this.list.size(); i++) {
-        	if (this.list.get(i).toString().length() < 5 && i != this.list.size() - 1) {
-        		stringBuilder.insert(0, this.list.get(i).toString());
-        		for (int j = 1; j <= 5 - this.list.get(i).toString().length(); j++) {
+        for (int i = 0; i < myList.length; i++) {
+        	if (((Long)myList[i]).toString().length() < 5 && i != myList.length - 1) {
+        		stringBuilder.insert(0, myList[i]);
+        		for (int j = 1; j <= 5 - ((Long)myList[i]).toString().length(); j++) {
         			stringBuilder.insert(0, "0");
         		}
         	}else {
-        		stringBuilder.insert(0, this.list.get(i));
+        		stringBuilder.insert(0, myList[i]);
         	}
         }
         if (this.isNegative) {
@@ -784,8 +833,12 @@ public class Num implements Comparable<Num> {
      * 
      * @return - List
      */
-    public List<Long> getList() {
-        return list;
+    public long[] getList() {
+        return arr;
+    }
+    
+    public void setList(long[] arr) {
+    	this.arr = arr;
     }
 
     /**
@@ -842,20 +895,27 @@ public class Num implements Comparable<Num> {
      * @param out      - Output List
      * @param base     - base
      */
-    private static void add(List<Long> num1List, List<Long> num2List, List<Long> out, long base) {
+    private static void add(long[] num1List, long[] num2List, long[] out, long base) {
 
-        Iterator<Long> num1Iterator = num1List.iterator();
-        Iterator<Long> num2Iterator = num2List.iterator();
+//        Iterator<Long> num1Iterator = num1List.iterator();
+//        Iterator<Long> num2Iterator = num2List.iterator();
+    	int i = 0;
+    	int j = 0;
         Long carry = 0L;
-        while (num1Iterator.hasNext() || num2Iterator.hasNext() || carry > 0) {
-            Long sum = next(num1Iterator) + next(num2Iterator) + carry;
+//        while (num1Iterator.hasNext() || num2Iterator.hasNext() || carry > 0) {
+        while(i < num1List.length || j < num2List.length || carry > 0) {
+//            Long sum = next(num1Iterator) + next(num2Iterator) + carry;
+        	long sum = num1List[i] + num2List[j] + carry;
             if (sum >= base) {
                 carry = 1L;
                 sum -= base;
             } else {
                 carry = 0L;
             }
-            out.add(sum);
+//            out.add(sum);
+            out = Num.insertAtEnd(out, sum);
+            i++;
+            j++;
         }
 
     }
@@ -868,13 +928,18 @@ public class Num implements Comparable<Num> {
      * @param out      - Output List
      * @param base     - base
      */
-    private static void subtract(List<Long> num1List, List<Long> num2List, List<Long> outList) {
-        Iterator<Long> num1Iterator = num1List.iterator();
-        Iterator<Long> num2Iterator = num2List.iterator();
+    private static void subtract(long[] num1List, long[] num2List, long[] outList) {
+//        Iterator<Long> num1Iterator = num1List.iterator();
+//        Iterator<Long> num2Iterator = num2List.iterator();
+    	int i = 0;
+    	int j = 0;
         Long borrow = 0L;
-        while (num1Iterator.hasNext() || num2Iterator.hasNext() || borrow > 0) {
-            Long a = next(num1Iterator);
-            Long b = next(num2Iterator);
+//        while (num1Iterator.hasNext() || num2Iterator.hasNext() || borrow > 0) {
+        while(i < num1List.length || j < num2List.length || borrow > 0) {
+//            Long a = next(num1Iterator);
+//            Long b = next(num2Iterator);
+        	long a = num1List[i];
+        	long b = num2List[j];
             Long out;
             a-=borrow;
             borrow=0L;
@@ -885,17 +950,25 @@ public class Num implements Comparable<Num> {
                 out = (a + base) - b;
                 borrow = 1L;
             }
-            outList.add(out);
+//            outList.add(out);
+            outList = insertAtEnd(outList, out);
+            i++;
+            j++;
 
         }
-        int i = outList.size()-1;
-        while(outList.get(i)==0)
+        i = outList.length-1;
+        while(outList[i]==0)
         {
-            outList.remove(i);
+//            outList.remove(i);
+            outList = removeAtEnd(outList);
             i--;
         }
-
-
+    }
+    
+    private static long[] removeAtEnd(long[] array) {
+    	long[] newArray = new long[array.length - 1];
+    	System.arraycopy(array, 0, newArray, 0, array.length - 1);
+    	return newArray;
     }
 
     /**
@@ -905,13 +978,19 @@ public class Num implements Comparable<Num> {
      * @param num2List - Integer 2 List
      * @return int(0,1,-1)
      */
-    private static int compareList(List<Long> num1List, List<Long> num2List) {
+    private static int compareList(long[] num1List, long[] num2List) {
         int out = 0;
-        Iterator<Long> iterator1 = num1List.iterator();
-        Iterator<Long> iterator2 = num2List.iterator();
-        while (iterator1.hasNext() || iterator2.hasNext()) {
-            Long a = iterator1.hasNext() ? iterator1.next() : 0L;
-            Long b = iterator2.hasNext() ? iterator2.next() : 0L;
+//        Iterator<Long> iterator1 = num1List.iterator();
+//        Iterator<Long> iterator2 = num2List.iterator();
+//        while (iterator1.hasNext() || iterator2.hasNext()) {
+        
+        int i = 0;
+        int j = 0;
+        while (i < num1List.length || j < num2List.length) {
+//            Long a = iterator1.hasNext() ? iterator1.next() : 0L;
+//            Long b = iterator2.hasNext() ? iterator2.next() : 0L;
+        	  Long a = i < num1List.length ? i++ : 0L;
+        	  Long b = j < num2List.length ? j++ : 0L;
             if (a > b) {
                 out = 1;
             } else if (a < b) {
