@@ -193,10 +193,13 @@ public class Num implements Comparable<Num> {
         Num out = new Num();
         List<Long> outList = out.getList();
         if(a.compareTo(new Num(0L))!=0)
+        {
             outList.addAll(a.getList());
-        for (long i = 0; i < n; i++) {
-            outList.add(0, 0L);
+            for (long i = 0; i < n; i++) {
+                outList.add(0, 0L);
+            }
         }
+            
         return out;
     }
 
@@ -856,8 +859,10 @@ public class Num implements Comparable<Num> {
             Long a = next(num1Iterator);
             Long b = next(num2Iterator);
             Long out;
+            a-=borrow;
+            borrow=0L;
             if (a >= b) {
-                out = a - (b + borrow);
+                out = a - b + borrow;
                 borrow = 0L;
             } else {
                 out = (a + base) - b;
@@ -866,6 +871,13 @@ public class Num implements Comparable<Num> {
             outList.add(out);
 
         }
+        int i = outList.size()-1;
+        while(outList.get(i)==0)
+        {
+            outList.remove(i);
+            i--;
+        }
+
 
     }
 
@@ -961,23 +973,23 @@ public class Num implements Comparable<Num> {
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
-        Num h = Num.divide(x, y);
-        Num f = Num.evaluateInfix(
-                new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321", "*",
-                        "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
-                        "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
-                        "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
-        Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321", "5432109876543210987654321",
-                "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*",
-                "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-",
-                "*", "+", "7896543", "*", "157984320", "+" });
+        // Num h = Num.divide(x, y);
+        // Num f = Num.evaluateInfix(
+        //         new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321", "*",
+        //                 "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
+        //                 "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
+        //                 "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
+        // Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321", "5432109876543210987654321",
+        //         "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*",
+        //         "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-",
+        //         "*", "+", "7896543", "*", "157984320", "+" });
 
-        e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
-        e = evaluateExp("( 3 + 4 ) *5");
+        // e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
+        // e = evaluateExp("( 3 + 4 ) *5");
         e= power(new Num("56"),5L);
-        e = squareRoot(new Num("64"));
+        // e = squareRoot(new Num("64"));
         System.out.println(d);
-        System.out.println(z);
+        System.out.println(e);
         if (z != null)
             z.printList();
     }
