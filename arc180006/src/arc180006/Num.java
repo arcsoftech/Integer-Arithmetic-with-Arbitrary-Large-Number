@@ -548,7 +548,19 @@ public class Num implements Comparable<Num> {
 
     // Return number equal to "this" number, in base=newBase
     public Num convertBase(int newBase) {
-        return null;
+        Num result = new Num();
+//        result.base = newBase;
+        Num newBaseNum = new Num((long) newBase);
+        Num oldNum = new Num(this.toString());
+
+        while (Num.divide(oldNum, newBaseNum).compareTo(new Num("0")) != 0) {
+        	result.getList().add(mod(oldNum, newBaseNum).getList().get(0));
+        	oldNum = Num.divide(oldNum, newBaseNum);
+        }
+        if (mod(oldNum, newBaseNum).compareTo(new Num("0")) != 0){
+        	result.getList().add(mod(oldNum, newBaseNum).getList().get(0));
+        }
+    	return result;
     }
 
     // Divide by 2, for using in binary search
@@ -985,11 +997,14 @@ public class Num implements Comparable<Num> {
      * @param args
      */
     public static void main(String[] args) {
-        Num x = new Num("15241383936‬");
-        Num y = new Num("123456700000000");
-        Num z = Num.add(x, y);
-        Num d = Num.subtract(x, y);
-        Num e = Num.product(x, y);
+    	Num x = new Num("999");
+    	System.out.println(x.convertBase(5).toString());
+    	
+//        Num x = new Num("15241383936‬");
+//        Num y = new Num("123456700000000");
+//        Num z = Num.add(x, y);
+//        Num d = Num.subtract(x, y);
+//        Num e = Num.product(x, y);
         // Num h = Num.divide(x, y);
         // Num f = Num.evaluateInfix(
         //         new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321", "*",
@@ -1004,11 +1019,11 @@ public class Num implements Comparable<Num> {
         // e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
         // e = evaluateExp("( 3 + 4 ) *5");
         // e= power(new Num("56"),5L);
-        e = squareRoot(new Num("15241383936"));
-        System.out.println(d);
-        System.out.println(e);
-        if (z != null)
-            z.printList();
+//        e = squareRoot(new Num("15241383936"));
+//        System.out.println(d);
+//        System.out.println(e);
+//        if (z != null)
+//            z.printList();
     }
 
 }
