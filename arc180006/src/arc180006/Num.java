@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class Num implements Comparable<Num> {
 
-    static long defaultBase = 100000; // Change as needed
+    static long defaultBase = 100000L; // Change as needed
     long base = 100000L; // Change as needed
     long[] arr; // array to store arbitrarily large integers
     boolean isNegative; // boolean flag to represent negative numbers
@@ -37,6 +37,8 @@ public class Num implements Comparable<Num> {
         if (s.length() == 0) {
             throw new NullPointerException("Invalid number");
         }
+        arr= new long[s.length()];
+        len=s.length();
         list = new ArrayList<>();
         Num Base = new Num(10);
         char[] arr = new StringBuilder(s).toString().toCharArray();
@@ -559,7 +561,7 @@ public class Num implements Comparable<Num> {
     // Return number equal to "this" number, in base=newBase
     public Num convertBase(int newBase) {
         Num result = new Num();
-        //        result.base = newBase;
+               result.base = newBase;
                 Num newBaseNum = new Num((long) newBase);
                 Num oldNum = new Num(this.toString());
         
