@@ -12,7 +12,7 @@
 
 2. Run the following command:-
 
-    Compile : `javac -d bin arc180006/*.java`  <br />
+    Compile : `javac -d bin arc180006/*.java` 
     ChangeDirectory: `cd bin`
-    Run: ` java -Xss512m -Xms2g  arc180006.Num` <br />
+    Run: ` java -Xss512m -Xms2g  arc180006.Num`
 

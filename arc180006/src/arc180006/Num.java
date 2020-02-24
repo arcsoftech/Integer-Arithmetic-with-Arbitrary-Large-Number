@@ -2,7 +2,7 @@
 /**
  * Integer Arithmetic for arbitarary large integres.
  *
- *  @author Arihant Chhajed, Cuong Ngo , Bushan Vaishist
+ *  @author Arihant Chhajed, Cuong Ngo , Bhushan Vaishist
  *  Ver 1.0: 2020/01/27
  */
 
@@ -1011,20 +1011,6 @@ public class Num implements Comparable<Num> {
         Num z = Num.add(x, y);
         Num d = Num.subtract(x, y);
         Num e = Num.product(x, y);
-        // Num h = Num.divide(x, y);
-        // Num f = Num.evaluateInfix(
-        //         new String[] { "(", "(", "98765432109876543210987654321", "+", "5432109876543210987654321", "*",
-        //                 "345678901234567890123456789012", ")", "*", "246801357924680135792468013579", "+",
-        //                 "12345678910111213141516171819202122", "*", "(", "191817161514131211109876543210", "-", "13579",
-        //                 "*", "24680", ")", ")", "*", "7896543", "+", "157984320" });
-        // Num g = Num.evaluatePostfix(new String[] { "98765432109876543210987654321", "5432109876543210987654321",
-        //         "345678901234567890123456789012", "*", "+", "246801357924680135792468013579", "*",
-        //         "12345678910111213141516171819202122", "191817161514131211109876543210", "13579", "24680", "*", "-",
-        //         "*", "+", "7896543", "*", "157984320", "+" });
-
-        // e = evaluateExp("(33333333333333333333333333+4444444444444444444444444444444444) * 5555555555555555555555555555555555555");
-        // e = evaluateExp("( 3 + 4 ) *5");
-        // e= power(new Num("56"),5L);
         e = squareRoot(new Num("15241383936"));
         System.out.println(d);
         System.out.println(e);
