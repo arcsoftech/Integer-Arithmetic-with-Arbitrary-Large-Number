@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 public class Num implements Comparable<Num> {
 
-    static long defaultBase = 10; // Change as needed
-    static long base = 100000L; // Change as needed
+    static long defaultBase = 100000L; // Change as needed
+    long base = 100000L; // Change as needed
     long[] arr; // array to store arbitrarily large integers
     boolean isNegative; // boolean flag to represent negative numbers
     static boolean karatsuba = false;
@@ -37,6 +37,8 @@ public class Num implements Comparable<Num> {
         if (s.length() == 0) {
             throw new NullPointerException("Invalid number");
         }
+        arr= new long[s.length()];
+        len=s.length();
         list = new ArrayList<>();
         Num Base = new Num(10);
         char[] arr = new StringBuilder(s).toString().toCharArray();
@@ -140,7 +142,11 @@ public class Num implements Comparable<Num> {
         if (a.getList().size() == 0 || b.getList().size() == 0) {
             return new Num(0L);
         }
-        out = karatsuba(a, b);
+        if(compareList(a.getList(),b.getList()) >= 0){
+            out = karatsuba(a,b);
+        }else{
+            out = karatsuba(b,a);
+        }
 
         out.isNegative = a.isNegative ^ b.isNegative;
 
@@ -217,7 +223,7 @@ public class Num implements Comparable<Num> {
         Long carry = 0L;
         while (num1Iterator.hasNext()) {
             Long prod = (next(num1Iterator) * b) + carry;
-            List<Long> prodList = toBase(prod, base);
+            List<Long> prodList = toBase(prod, defaultBase);
             outList.add(prodList.get(0));
             carry = prodList.size() > 1 ? prodList.get(1) : 0L;
         }
@@ -267,8 +273,6 @@ public class Num implements Comparable<Num> {
     public static Num power(Num a, long n) {
 		if(n < 0)
 		{
-//			nNum = subtract(new Num(0), nNum);
-//			a = divide(new Num(1), a);
 			return new Num(0); // we do not deal with fraction, only int division
 		}
 		return powerHelper(a, n);
@@ -372,16 +376,12 @@ public class Num implements Comparable<Num> {
     		return new Num(0);
     	}
     	Num quotient = new Num(0);
-    	Num one = new Num(1);
     	
     	
     	do {
     		Integer numZeros = getNumberOfPaddingZero(a, b);
     		Num paddedB = getNumWithPaddingZero(b, numZeros);
         	a = subtract (a, paddedB);
-//        	if (a.getList().get(a.getList().size() - 1) == 0) {
-//        		a.getList().remove(a.getList().size() - 1);
-//        	}
         	quotient = add (quotient , tenPower(numZeros));
     	} while (b.compareTo(a) <= 0); // do until a < b
     	quotient.isNegative = isNegative;
@@ -457,7 +457,7 @@ public class Num implements Comparable<Num> {
     	int compare = a.compareTo(b);
     	return compare == 0 ? new Num(0) 
     			: compare < 0 ? a 
-    			: subtract (a, product(b, divide(a, b)));
+    			: Num.subtract (a, product(b, divide(a, b)));
     }
 
     /**
@@ -497,19 +497,19 @@ public class Num implements Comparable<Num> {
      * 
      * @return int(0,1,-1)
      */
-    public int compareTo(Num num2) {
-        if (this.isNegative && !num2.isNegative) {
+    public int compareTo(Num other) {
+        if (this.isNegative && !other.isNegative) {
             return -1;
-        } else if (!this.isNegative && num2.isNegative) {
+        } else if (!this.isNegative && other.isNegative) {
             return 1;
-        } else if (this.isNegative && num2.isNegative) {
-            int out = compareList(this.getList(), num2.getList());
+        } else if (this.isNegative && other.isNegative) {
+            int out = compareList(this.getList(), other.getList());
             if (out != 0) {
                 return out * -1;
             }
             return out;
         } else {
-            return compareList(this.getList(), num2.getList());
+            return compareList(this.getList(), other.getList());
         }
     }
 
@@ -517,13 +517,18 @@ public class Num implements Comparable<Num> {
     // For example, if base=100, and the number stored corresponds to 10965,
     // then the output is "100: 65 9 1"
     public void printList() {
+        System.out.print(this.base + ":");
+		Iterator<Long> revIt = this.list.iterator();
+		while (revIt.hasNext()) {
+			System.out.print(" " + revIt.next());
+		}
+		System.out.println();
     }
 
     /**
      * Method to return Integer of type Num to string
      */
     public String toString() {
-    	List<Long> myList = this.list;
         StringBuilder stringBuilder = new StringBuilder();
         
         for (int i = 0; i < this.list.size(); i++) {
@@ -546,9 +551,25 @@ public class Num implements Comparable<Num> {
         return base;
     }
 
-    // Return number equal to "this" number, in base=newBase
+    /**
+     * Return number equal to "this" number, in base=newBase
+     * @param newBase
+     * @return
+     */
     public Num convertBase(int newBase) {
-        return null;
+        Num result = new Num();
+               result.base = newBase;
+                Num newBaseNum = new Num((long) newBase);
+                Num oldNum = new Num(this.toString());
+        
+                while (Num.divide(oldNum, newBaseNum).compareTo(new Num("0")) != 0) {
+                    result.getList().add(mod(oldNum, newBaseNum).getList().get(0));
+                    oldNum = Num.divide(oldNum, newBaseNum);
+                }
+                if (mod(oldNum, newBaseNum).compareTo(new Num("0")) != 0){
+                    result.getList().add(mod(oldNum, newBaseNum).getList().get(0));
+                }
+                return result;
     }
 
     // Divide by 2, for using in binary search
@@ -820,7 +841,7 @@ public class Num implements Comparable<Num> {
      */
     private static Num addHelper(Num a, Num b) {
         Num out = new Num();
-        add(a.getList(), b.getList(), out.getList(), Num.base);
+        add(a.getList(), b.getList(), out.getList(), defaultBase);
         return out;
     }
 
@@ -882,7 +903,7 @@ public class Num implements Comparable<Num> {
                 out = a - b + borrow;
                 borrow = 0L;
             } else {
-                out = (a + base) - b;
+                out = (a + defaultBase) - b;
                 borrow = 1L;
             }
             outList.add(out);
