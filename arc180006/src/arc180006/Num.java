@@ -376,16 +376,12 @@ public class Num implements Comparable<Num> {
     		return new Num(0);
     	}
     	Num quotient = new Num(0);
-    	Num one = new Num(1);
     	
     	
     	do {
     		Integer numZeros = getNumberOfPaddingZero(a, b);
     		Num paddedB = getNumWithPaddingZero(b, numZeros);
         	a = subtract (a, paddedB);
-//        	if (a.getList().get(a.getList().size() - 1) == 0) {
-//        		a.getList().remove(a.getList().size() - 1);
-//        	}
         	quotient = add (quotient , tenPower(numZeros));
     	} while (b.compareTo(a) <= 0); // do until a < b
     	quotient.isNegative = isNegative;
