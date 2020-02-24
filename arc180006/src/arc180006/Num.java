@@ -273,8 +273,6 @@ public class Num implements Comparable<Num> {
     public static Num power(Num a, long n) {
 		if(n < 0)
 		{
-//			nNum = subtract(new Num(0), nNum);
-//			a = divide(new Num(1), a);
 			return new Num(0); // we do not deal with fraction, only int division
 		}
 		return powerHelper(a, n);
@@ -503,19 +501,19 @@ public class Num implements Comparable<Num> {
      * 
      * @return int(0,1,-1)
      */
-    public int compareTo(Num num2) {
-        if (this.isNegative && !num2.isNegative) {
+    public int compareTo(Num other) {
+        if (this.isNegative && !other.isNegative) {
             return -1;
-        } else if (!this.isNegative && num2.isNegative) {
+        } else if (!this.isNegative && other.isNegative) {
             return 1;
-        } else if (this.isNegative && num2.isNegative) {
-            int out = compareList(this.getList(), num2.getList());
+        } else if (this.isNegative && other.isNegative) {
+            int out = compareList(this.getList(), other.getList());
             if (out != 0) {
                 return out * -1;
             }
             return out;
         } else {
-            return compareList(this.getList(), num2.getList());
+            return compareList(this.getList(), other.getList());
         }
     }
 
@@ -535,7 +533,6 @@ public class Num implements Comparable<Num> {
      * Method to return Integer of type Num to string
      */
     public String toString() {
-    	List<Long> myList = this.list;
         StringBuilder stringBuilder = new StringBuilder();
         
         for (int i = 0; i < this.list.size(); i++) {
@@ -558,7 +555,11 @@ public class Num implements Comparable<Num> {
         return base;
     }
 
-    // Return number equal to "this" number, in base=newBase
+    /**
+     * Return number equal to "this" number, in base=newBase
+     * @param newBase
+     * @return
+     */
     public Num convertBase(int newBase) {
         Num result = new Num();
                result.base = newBase;
